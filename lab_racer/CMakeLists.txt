@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
-project (lab_racer CXX)
+project(lab_racer CXX)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -28,8 +28,8 @@ link_directories("/usr/local/lib" "/usr/local/opt/llvm/lib")
 
 file(GLOB_RECURSE lab_2_SOURCES "src/*.cpp")
 
-add_executable(lab_racer ${lab_2_SOURCES} )
-target_link_libraries(lab_racer ${SDL2_LIBRARIES}  ${SDL2IMAGE_LIBRARIES})
+add_executable(lab_racer ${lab_2_SOURCES} src/utils/general.h src/utils/my_math.h src/utils/MyText.h src/utils/MyText.cpp)
+target_link_libraries(lab_racer ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} SDL2_ttf)
 
 add_custom_command(TARGET lab_racer PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory

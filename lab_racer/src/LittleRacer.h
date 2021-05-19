@@ -6,8 +6,10 @@
 #define SDLDEMO_LITTLEPLAYER_H
 
 #include "SDL.h"
+#include <iostream>
+#include <utils/MyText.h>
 
-struct LittlePlayer {
+struct LittleRacer {
     struct Controls {
         SDL_Scancode up;
         SDL_Scancode right;
@@ -20,23 +22,29 @@ struct LittlePlayer {
     SDL_Color color = {};
     Controls controls = {};
     float acceleration;
+    SDL_Texture *texture;
+    double rotation = 0;
+    double rotationAcceleration = 3;
+    MyText *speedOMeter;
 
+    float absSpeed = 0;
     SDL_FPoint speed = {};
     SDL_FPoint position = {};
 
-    LittlePlayer(
-            SDL_Renderer *_renderer,
-            SDL_Rect _rect,
-            SDL_Color _color,
-            Controls _controls,
-            float _acceleration
+    LittleRacer(
+            SDL_Renderer *_renderer, SDL_Rect _rect, SDL_Color _color, LittleRacer::Controls _controls,
+            float _acceleration, SDL_Texture *_texture, MyText *_speedOMeter
     );
+
+    ~LittleRacer();
 
     void update(const Uint8 *keyboardState);
 
     void draw();
 
     void stop();
+
+    SDL_Point intPosition();
 };
 
 
