@@ -70,7 +70,7 @@ int main(int, char **) {
             {-20, -20, 40, 80},
             {255, 128, 128, 255},
             {SDL_SCANCODE_W, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_A},
-            0.5,
+            0.07,
             IMG_LoadTexture(&*renderer, "data/little_racer.png"),
             &txt
     );

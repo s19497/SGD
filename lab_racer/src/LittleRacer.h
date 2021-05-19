@@ -28,7 +28,6 @@ struct LittleRacer {
     MyText *speedOMeter;
 
     float absSpeed = 0;
-    SDL_FPoint speed = {};
     SDL_FPoint position = {};
 
     LittleRacer(
@@ -44,7 +43,8 @@ struct LittleRacer {
 
     void stop();
 
-    SDL_Point intPosition();
+private:
+    void displaySpeed() const;
 };
 
 

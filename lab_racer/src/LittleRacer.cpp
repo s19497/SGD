@@ -9,14 +9,16 @@ void LittleRacer::stop() {
     absSpeed = 0;
 }
 
-void LittleRacer::draw() {
+void LittleRacer::displaySpeed() const {
     char speedDisplay[20];
-    sprintf(speedDisplay, "%.2f", absSpeed);
+    sprintf(speedDisplay, "%d km/h", (int) (absSpeed * 10));
     speedOMeter->setText(speedDisplay);
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderFillRect(renderer, &rect);
+}
+
+void LittleRacer::draw() {
+    displaySpeed();
     SDL_RenderCopyEx(
-            renderer,texture,nullptr,&rect,rotation,nullptr,
+            renderer, texture, nullptr, &rect, rotation, nullptr,
             SDL_RendererFlip::SDL_FLIP_NONE
     );
 }
@@ -35,11 +37,14 @@ void LittleRacer::update(const Uint8 *keyboardState) {
         rotation += rotationAcceleration;
     }
 
-    speed.x = absSpeed * sin(jp_ns::degToRad(rotation));
-    speed.y = absSpeed * cos(jp_ns::degToRad(rotation));
+    static float deceleration = 0.0001f;
+    absSpeed *= 1 - absSpeed * absSpeed * deceleration;
 
-    position.x += speed.x;
-    position.y -= speed.y;
+    float speedX = absSpeed * (float) sin(jp_ns::degToRad(rotation));
+    float speedY = absSpeed * (float) cos(jp_ns::degToRad(rotation));
+
+    position.x += speedX;
+    position.y -= speedY;
     rect.x = (int) position.x;
     rect.y = (int) position.y;
 }
@@ -66,6 +71,3 @@ LittleRacer::~LittleRacer() {
     SDL_DestroyTexture(texture);
 }
 
-SDL_Point LittleRacer::intPosition() {
-    return {(int) position.x, (int) position.y};
-}
