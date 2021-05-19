@@ -5,7 +5,7 @@
  */
 
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <iostream>
 #include <chrono>
 #include <iostream>
@@ -21,31 +21,38 @@
     }                                                                          \
   }
 
+int init(SDL_Window *&window, SDL_Renderer *&renderer, int width, int height) {
+    errcheck(SDL_Init(SDL_INIT_VIDEO))
+
+    window = SDL_CreateWindow(
+            "My Next Superawesome Game", SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN
+    );
+    errcheck(window == nullptr)
+
+    renderer = SDL_CreateRenderer(
+            window, -1, SDL_RENDERER_ACCELERATED
+    ); // SDL_RENDERER_PRESENTVSYNC
+    errcheck(renderer == nullptr)
+
+    SDL_SetWindowResizable(window, static_cast<SDL_bool>(true));
+
+    return 0;
+}
 
 void clearRenderer(SDL_Renderer *renderer) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 }
 
-
 int main(int, char **) {
     const int WIDTH = 640;
     const int HEIGHT = 480;
 
-    errcheck(SDL_Init(SDL_INIT_VIDEO))
+    SDL_Window *window{};
+    SDL_Renderer *renderer{};
 
-    SDL_Window *window = SDL_CreateWindow(
-            "My Next Superawesome Game", SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN
-    );
-    errcheck(window == nullptr)
-
-    SDL_Renderer *renderer = SDL_CreateRenderer(
-            window, -1, SDL_RENDERER_ACCELERATED
-    ); // SDL_RENDERER_PRESENTVSYNC
-    errcheck(renderer == nullptr)
-
-    SDL_SetWindowResizable(window, static_cast<SDL_bool>(true));
+    errcheck(init(window, renderer, WIDTH, HEIGHT));
 
     std::chrono::milliseconds dt(15);
     std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
@@ -77,7 +84,13 @@ int main(int, char **) {
                 game_active = false;
             }
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                player_1.position = {(float) event.button.x, (float) event.button.y};
+                SDL_FPoint newPosition = {(float) event.button.x, (float) event.button.y};
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    player_1.position = newPosition;
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    player_2.position = newPosition;
+                }
             }
             keyboardState = SDL_GetKeyboardState(nullptr);
         }
@@ -87,9 +100,9 @@ int main(int, char **) {
         }
 
         player_1.update(keyboardState);
-        player_1.draw();
-
         player_2.update(keyboardState);
+
+        player_1.draw();
         player_2.draw();
 
         SDL_RenderPresent(renderer); // draw frame to screen
