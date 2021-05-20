@@ -22,6 +22,22 @@ void LittleRacer::draw() {
             renderer, texture, nullptr, &rect, rotation, nullptr,
             SDL_RendererFlip::SDL_FLIP_NONE
     );
+
+    if (!showVectors) {
+        return;
+    }
+
+    int centerX = rect.x + rect.w / 2;
+    int centerY = rect.y + rect.h / 2;
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + speed.x * 50, centerY);
+
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
+    SDL_RenderDrawLine(renderer, centerX, centerY, centerX, centerY - speed.y * 50);
+
+    SDL_SetRenderDrawColor(renderer, 255, 200, 255, 255);
+    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + speed.x * 50, centerY - speed.y * 50);
 }
 
 float airBrake(float speed) {

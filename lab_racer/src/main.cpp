@@ -92,6 +92,11 @@ int main(int, char **) {
                     player_1.position = newPosition;
                 }
             }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.scancode == SDL_SCANCODE_V) {
+                    player_1.showVectors = !player_1.showVectors;
+                }
+            }
             keyboardState = SDL_GetKeyboardState(nullptr);
         }
 
