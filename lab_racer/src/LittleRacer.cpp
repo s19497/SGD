@@ -6,12 +6,13 @@
 #include "utils/my_math.h"
 
 void LittleRacer::stop() {
-    absSpeed = 0;
+    speed.x = 0;
+    speed.y = 0;
 }
 
 void LittleRacer::displaySpeed() const {
-    char speedDisplay[20];
-    sprintf(speedDisplay, "%d km/h", (int) (absSpeed * 10));
+    static char speedDisplay[20];
+    sprintf(speedDisplay, "%d km/h", (int) (10 * jp_ns::pythagoras(speed.x, speed.y)));
     speedOMeter->setText(speedDisplay);
 }
 
@@ -23,12 +24,20 @@ void LittleRacer::draw() {
     );
 }
 
+float airBrake(float speed) {
+    static float deceleration = 0.001f;
+    speed *= 1 - speed * speed * deceleration;
+    return speed;
+}
+
 void LittleRacer::update(const Uint8 *keyboardState) {
     if (keyboardState[controls.up]) {
-        absSpeed += acceleration;
+        speed.x += acceleration * (float) sin(jp_ns::degToRad(rotation));
+        speed.y += acceleration * (float) cos(jp_ns::degToRad(rotation));
     }
     if (keyboardState[controls.down]) {
-        absSpeed -= acceleration;
+        speed.x -= acceleration * (float) sin(jp_ns::degToRad(rotation));
+        speed.y -= acceleration * (float) cos(jp_ns::degToRad(rotation));
     }
     if (keyboardState[controls.left]) {
         rotationSpeed -= rotationAcceleration;
@@ -40,14 +49,8 @@ void LittleRacer::update(const Uint8 *keyboardState) {
     rotation += rotationSpeed;
     rotation *= 0.9;
 
-    static float deceleration = 0.0001f;
-    absSpeed *= 1 - absSpeed * absSpeed * deceleration;
-
-    float speedX = absSpeed * (float) sin(jp_ns::degToRad(rotation));
-    float speedY = absSpeed * (float) cos(jp_ns::degToRad(rotation));
-
-    position.x += speedX;
-    position.y -= speedY;
+    position.x += airBrake(speed.x);
+    position.y -= airBrake(speed.y);
     rect.x = (int) position.x;
     rect.y = (int) position.y;
 }

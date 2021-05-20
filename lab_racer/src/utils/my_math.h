@@ -11,6 +11,11 @@ namespace jp_ns {
     double degToRad(double deg) {
         return deg * (PI / 180);
     }
+
+    float pythagoras(float a, float b) {
+        return sqrt(a * a + b * b);
+    }
+
 }
 
 #endif //LAB_RACER_MY_MATH_H

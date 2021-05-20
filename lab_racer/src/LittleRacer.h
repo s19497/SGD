@@ -27,8 +27,8 @@ struct LittleRacer {
     double rotationAcceleration = .5;
     MyText *speedOMeter;
 
-    float absSpeed = 0;
-    SDL_FPoint position = {};
+    SDL_FPoint speed{};
+    SDL_FPoint position{};
 
     LittleRacer(
             SDL_Renderer *_renderer,
