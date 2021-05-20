@@ -31,11 +31,14 @@ void LittleRacer::update(const Uint8 *keyboardState) {
         absSpeed -= acceleration;
     }
     if (keyboardState[controls.left]) {
-        rotation -= rotationAcceleration;
+        rotationSpeed -= rotationAcceleration;
     }
     if (keyboardState[controls.right]) {
-        rotation += rotationAcceleration;
+        rotationSpeed += rotationAcceleration;
     }
+
+    rotation += rotationSpeed;
+    rotation *= 0.9;
 
     static float deceleration = 0.0001f;
     absSpeed *= 1 - absSpeed * absSpeed * deceleration;
@@ -52,15 +55,12 @@ void LittleRacer::update(const Uint8 *keyboardState) {
 LittleRacer::LittleRacer(
         SDL_Renderer *_renderer,
         SDL_Rect _rect,
-        SDL_Color _color,
         LittleRacer::Controls _controls,
         float _acceleration,
-        SDL_Texture *_texture,
-        MyText *_speedOMeter
+        SDL_Texture *_texture, MyText *_speedOMeter
 ) {
     renderer = _renderer;
     rect = _rect;
-    color = _color;
     controls = _controls;
     acceleration = _acceleration;
     texture = _texture;
@@ -70,4 +70,3 @@ LittleRacer::LittleRacer(
 LittleRacer::~LittleRacer() {
     SDL_DestroyTexture(texture);
 }
-

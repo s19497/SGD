@@ -19,20 +19,24 @@ struct LittleRacer {
 
     SDL_Renderer *renderer;
     SDL_Rect rect = {};
-    SDL_Color color = {};
     Controls controls = {};
     float acceleration;
     SDL_Texture *texture;
     double rotation = 0;
-    double rotationAcceleration = 3;
+    double rotationSpeed = 0;
+    double rotationAcceleration = .5;
     MyText *speedOMeter;
 
     float absSpeed = 0;
     SDL_FPoint position = {};
 
     LittleRacer(
-            SDL_Renderer *_renderer, SDL_Rect _rect, SDL_Color _color, LittleRacer::Controls _controls,
-            float _acceleration, SDL_Texture *_texture, MyText *_speedOMeter
+            SDL_Renderer *_renderer,
+            SDL_Rect _rect,
+            LittleRacer::Controls _controls,
+            float _acceleration,
+            SDL_Texture *_texture,
+            MyText *_speedOMeter
     );
 
     ~LittleRacer();

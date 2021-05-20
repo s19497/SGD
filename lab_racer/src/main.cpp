@@ -59,16 +59,14 @@ int main(int, char **) {
     errcheck(init(window, renderer, WIDTH, HEIGHT))
     MyText txt{
             renderer,
-            TTF_OpenFont("data/open-sans/OpenSans-Regular.ttf", 24),
-            {255, 128, 128, 255},
+            TTF_OpenFont("data/open-sans/OpenSans-Regular.ttf", 80),
+            {255, 255, 255, 255},
             {100, 100, 100, 100}
     };
-    txt.setText("Dupa");
 
     LittleRacer player_1(
             renderer,
             {-20, -20, 40, 80},
-            {255, 128, 128, 255},
             {SDL_SCANCODE_W, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_A},
             0.07,
             IMG_LoadTexture(&*renderer, "data/little_racer.png"),
