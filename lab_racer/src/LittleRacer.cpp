@@ -12,7 +12,8 @@ void LittleRacer::stop() {
 
 void LittleRacer::displaySpeed() const {
     static char speedDisplay[20];
-    sprintf(speedDisplay, "%d km/h", (int) (10 * jp_ns::pythagoras(speed.x, speed.y)));
+//    sprintf(speedDisplay, "%d km/h", (int) (10 * jp_ns::pythagoras(speed.x, speed.y)));
+    sprintf(speedDisplay, "%d km/h", (int) (frontSpeed()));
     speedOMeter->setText(speedDisplay);
 }
 
@@ -35,9 +36,6 @@ void LittleRacer::draw() {
 
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
     SDL_RenderDrawLine(renderer, centerX, centerY, centerX, centerY - speed.y * 50);
-
-    SDL_SetRenderDrawColor(renderer, 255, 200, 255, 255);
-    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + speed.x * 50, centerY - speed.y * 50);
 }
 
 float airBrake(float speed) {
@@ -63,7 +61,12 @@ void LittleRacer::update(const Uint8 *keyboardState) {
     }
 
     rotation += rotationSpeed;
-    rotation *= 0.9;
+    rotationSpeed *= 0.9;
+    if (rotation < 0) {
+        rotation += 360;
+    } else if (rotation > 360) {
+        rotation -= 360;
+    }
 
     position.x += airBrake(speed.x);
     position.y -= airBrake(speed.y);
@@ -89,3 +92,30 @@ LittleRacer::LittleRacer(
 LittleRacer::~LittleRacer() {
     SDL_DestroyTexture(texture);
 }
+
+float LittleRacer::frontSpeed() const {
+    float tg = speed.x != 0 ? atan(speed.y / speed.x) : 0;
+    float d = jp_ns::pythagoras(speed.x, speed.y);
+
+    float F = d * cos(jp_ns::degToRad(90 - rotation) - tg);
+    float Fy = F * sin(jp_ns::degToRad(90 - rotation));
+    float Fx = F * cos(jp_ns::degToRad(90 - rotation));
+
+    float S = d * sin(jp_ns::degToRad(90 - rotation) - tg);
+    float Sy = S * sin(jp_ns::degToRad(rotation));
+    float Sx = S * cos(jp_ns::degToRad(rotation));
+
+    float fd = 100;
+
+    int centerX = rect.x + rect.w / 2;
+    int centerY = rect.y + rect.h / 2;
+
+    SDL_SetRenderDrawColor(renderer, 0, 100, 255, 100);
+    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + Fx * fd, centerY - Fy * fd);
+
+    SDL_SetRenderDrawColor(renderer, 100, 0, 255, 100);
+    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + Sx * fd, centerY + Sy * fd);
+
+    return F;
+}
+

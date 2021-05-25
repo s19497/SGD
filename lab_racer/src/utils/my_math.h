@@ -9,7 +9,11 @@ namespace jp_ns {
     const static double PI = 3.14159265359;
 
     double degToRad(double deg) {
-        return deg * (PI / 180);
+        return deg * PI / 180;
+    }
+
+    double radToDeg(double rad) {
+        return rad * 180 / PI;
     }
 
     float pythagoras(float a, float b) {

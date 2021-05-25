@@ -27,6 +27,7 @@ struct LittleRacer {
     double rotationAcceleration = .5;
     MyText *speedOMeter;
     bool showVectors;
+    float driftFactor = .5;
 
     SDL_FPoint speed{};
     SDL_FPoint position{};
@@ -50,6 +51,8 @@ struct LittleRacer {
 
 private:
     void displaySpeed() const;
+
+    float frontSpeed() const;
 };
 
 
