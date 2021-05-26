@@ -10,10 +10,10 @@ void LittleRacer::stop() {
     speed.y = 0;
 }
 
-void LittleRacer::displaySpeed() const {
+void LittleRacer::displaySpeed() {
     static char speedDisplay[20];
 //    sprintf(speedDisplay, "%d km/h", (int) (10 * jp_ns::pythagoras(speed.x, speed.y)));
-    sprintf(speedDisplay, "%d km/h", (int) (frontSpeed()));
+    sprintf(speedDisplay, "%d km/h", (int) (frontSpeed));
     speedOMeter->setText(speedDisplay);
 }
 
@@ -38,10 +38,9 @@ void LittleRacer::draw() {
     SDL_RenderDrawLine(renderer, centerX, centerY, centerX, centerY - speed.y * 50);
 }
 
-float airBrake(float speed) {
-    static float deceleration = 0.001f;
+void airBrake(float &speed) {
+    static float deceleration = 0.0001f;
     speed *= 1 - speed * speed * deceleration;
-    return speed;
 }
 
 void LittleRacer::update(const Uint8 *keyboardState) {
@@ -59,17 +58,22 @@ void LittleRacer::update(const Uint8 *keyboardState) {
     if (keyboardState[controls.right]) {
         rotationSpeed += rotationAcceleration;
     }
-
-    rotation += rotationSpeed;
-    rotationSpeed *= 0.9;
-    if (rotation < 0) {
-        rotation += 360;
-    } else if (rotation > 360) {
-        rotation -= 360;
+    if (keyboardState[controls.handbrake]) {
+        handbrake = true;
+    } else {
+        handbrake = false;
     }
 
-    position.x += airBrake(speed.x);
-    position.y -= airBrake(speed.y);
+    applyFriction(keyboardState);
+
+    applyRotation();
+
+    airBrake(speed.x);
+    airBrake(speed.y);
+
+    position.x += speed.x;
+    position.y -= speed.y;
+
     rect.x = (int) position.x;
     rect.y = (int) position.y;
 }
@@ -93,15 +97,25 @@ LittleRacer::~LittleRacer() {
     SDL_DestroyTexture(texture);
 }
 
-float LittleRacer::frontSpeed() const {
-    float tg = speed.x != 0 ? atan(speed.y / speed.x) : 0;
-    float d = jp_ns::pythagoras(speed.x, speed.y);
+void LittleRacer::applyRotation() {
+    rotation += rotationSpeed;
+    rotationSpeed *= 0.9;
+    if (rotation < 0) {
+        rotation += 360;
+    } else if (rotation > 360) {
+        rotation -= 360;
+    }
+}
 
-    float F = d * cos(jp_ns::degToRad(90 - rotation) - tg);
-    float Fy = F * sin(jp_ns::degToRad(90 - rotation));
-    float Fx = F * cos(jp_ns::degToRad(90 - rotation));
+void LittleRacer::applyFriction(const Uint8 *keyboardState) {
+    float tg = speed.x != 0 ? atan2(speed.y, speed.x) : 0;
+    float absSpeed = jp_ns::pythagoras(speed.x, speed.y);
 
-    float S = d * sin(jp_ns::degToRad(90 - rotation) - tg);
+    frontSpeed = absSpeed * cos(jp_ns::degToRad(90 - rotation) - tg);
+//    float Fy = F * sin(jp_ns::degToRad(90 - rotation));
+//    float Fx = F * cos(jp_ns::degToRad(90 - rotation));
+
+    float S = absSpeed * sin(jp_ns::degToRad(90 - rotation) - tg);
     float Sy = S * sin(jp_ns::degToRad(rotation));
     float Sx = S * cos(jp_ns::degToRad(rotation));
 
@@ -110,12 +124,25 @@ float LittleRacer::frontSpeed() const {
     int centerX = rect.x + rect.w / 2;
     int centerY = rect.y + rect.h / 2;
 
-    SDL_SetRenderDrawColor(renderer, 0, 100, 255, 100);
-    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + Fx * fd, centerY - Fy * fd);
+    if (abs(S) > driftThreshold) {
+        isDrifting = true;
+        driftPoints += (int) (S * S);
+    } else {
+        isDrifting = false;
+    }
+
+    float friction = isDrifting ? driftFriction : normalFriction;
+
+    if (!keyboardState[controls.up]) {
+        friction += 0.02;
+    }
+
+    speed.x -= Sx * friction;
+    speed.y += Sy * friction;
+
+//    SDL_SetRenderDrawColor(renderer, 0, 100, 255, 100);
+//    SDL_RenderDrawLine(renderer, centerX, centerY, centerX + Fx * fd, centerY - Fy * fd);
 
     SDL_SetRenderDrawColor(renderer, 100, 0, 255, 100);
     SDL_RenderDrawLine(renderer, centerX, centerY, centerX + Sx * fd, centerY + Sy * fd);
-
-    return F;
 }
-

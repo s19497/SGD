@@ -15,6 +15,7 @@ struct LittleRacer {
         SDL_Scancode right;
         SDL_Scancode down;
         SDL_Scancode left;
+        SDL_Scancode handbrake;
     };
 
     SDL_Renderer *renderer;
@@ -24,10 +25,19 @@ struct LittleRacer {
     SDL_Texture *texture;
     double rotation = 0;
     double rotationSpeed = 0;
-    double rotationAcceleration = .5;
+    double rotationAcceleration = .2;
     MyText *speedOMeter;
     bool showVectors;
-    float driftFactor = .5;
+
+    float normalFriction = 0.9;
+    float handbrakeFriction = 0.01;
+    float driftFriction = 0.01;
+    float driftThreshold = 0.35;
+    bool isDrifting = false;
+    bool handbrake = false;
+
+    float frontSpeed = 0;
+    int driftPoints = 0;
 
     SDL_FPoint speed{};
     SDL_FPoint position{};
@@ -50,9 +60,11 @@ struct LittleRacer {
     void stop();
 
 private:
-    void displaySpeed() const;
+    void displaySpeed();
 
-    float frontSpeed() const;
+    void applyFriction(const Uint8 *keyboardState);
+
+    void applyRotation();
 };
 
 

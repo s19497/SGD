@@ -64,10 +64,23 @@ int main(int, char **) {
             {100, 100, 100, 100}
     };
 
+    MyText pointsText{
+        renderer,
+        TTF_OpenFont("data/open-sans/OpenSans-Regular.ttf", 80),
+        {255, 255, 255, 255},
+        {100, 200, 100, 100}
+    };
+
     LittleRacer player_1(
             renderer,
             {-20, -20, 40, 80},
-            {SDL_SCANCODE_W, SDL_SCANCODE_D, SDL_SCANCODE_S, SDL_SCANCODE_A},
+            {
+                    SDL_SCANCODE_W,
+                    SDL_SCANCODE_D,
+                    SDL_SCANCODE_S,
+                    SDL_SCANCODE_A,
+                    SDL_SCANCODE_SPACE
+            },
             0.07,
             IMG_LoadTexture(&*renderer, "data/little_racer.png"),
             &txt
@@ -100,7 +113,7 @@ int main(int, char **) {
             keyboardState = SDL_GetKeyboardState(nullptr);
         }
 
-        if (keyboardState[SDL_SCANCODE_SPACE]) {
+        if (keyboardState[SDL_SCANCODE_T]) {
             player_1.stop();
         }
 
@@ -108,6 +121,8 @@ int main(int, char **) {
         player_1.draw();
 
         txt.draw();
+        pointsText.setText(std::to_string(player_1.driftPoints).data());
+        pointsText.draw();
         SDL_RenderPresent(renderer);
         std::this_thread::sleep_until(current_time = current_time + dt);
     }
